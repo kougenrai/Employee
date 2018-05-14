@@ -15,13 +15,13 @@ namespace WebApplication.Controllers
     public class CheckinoutController : ApiController
     {
         public static String Database30 => "AccessMSDataBase";
-        public static String UserName30 => "sa";
+        public static String UserName30 => "zb";
         public static String Password30 => "Svc_2003";
         public static int Port30 => 1433;
 
         public static String Database201 => "integrated";
-        public static String UserName201 => "sa";
-        public static String Password201 => "123456";
+        public static String UserName201 => "zb";
+        public static String Password201 => "Svc_2003";
         public static int Port201 => 50008;
         private static string HttpContext => "MS_HttpContext";
         private static string RemoteEndpointMessage => "System.ServiceModel.Channels.RemoteEndpointMessageProperty";
