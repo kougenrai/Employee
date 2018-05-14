@@ -1,0 +1,153 @@
+﻿<Controls:MetroWindow x:Class="Employee.MainWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:p="clr-namespace:Employee.Properties"
+                      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      xmlns:local="clr-namespace:Employee"
+                      mc:Ignorable="d"
+                      Title="{x:Static p:Resources.IDS_TITLE}" 
+                      Height="450" 
+                      Width="800"
+                      GlowBrush="Gray"
+                      ResizeMode="CanResizeWithGrip"
+                      WindowStartupLocation="CenterScreen"
+                      FontFamily="{x:Static local:App.DefaultFontFamily}"
+                      Loaded="MetroWindow_Loaded">
+    <Controls:MetroWindow.RightWindowCommands>
+        <Controls:WindowCommands>
+            <CheckBox x:Name="chkFWTran"
+                      Content="{x:Static p:Resources.IDS_SDCC_FW_TRANSMISSION_MODE}"
+                      Foreground="White"
+                      Visibility="Hidden"
+                      Checked="chkFWTran_Checked"
+                      Unchecked="chkFWTran_Unchecked"/>
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.RightWindowCommands>
+    <Grid Margin="{StaticResource DefaultMarginSize}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="{StaticResource DefaultGridVerticalSpacing}"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="{StaticResource DefaultGridHorizontalSpacing}"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="{StaticResource DefaultGridHorizontalSpacing}"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="{StaticResource DefaultGridHorizontalSpacing}"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{x:Static p:Resources.IDS_NAME}"
+                       VerticalAlignment="Center"
+                       Grid.Column="0"/>
+            <TextBox x:Name="txtName"
+                     MaxLength="10"
+                     VerticalAlignment="Center"
+                     Grid.Column="2"
+                     PreviewKeyDown="txtName_PreviewKeyDown"/>
+            <Button x:Name="btnQuery"
+                    Content="{x:Static p:Resources.IDS_QUERY}"
+                    VerticalAlignment="Center"
+                    Grid.Column="4"
+                    Click="btnQuery_Click"/>
+            <TextBlock Text="{x:Static p:Resources.IDS_NOTICE}"
+                       VerticalAlignment="Center"
+                       Foreground="Red"
+                       FontWeight="Bold"
+                       Grid.Column="6"/>
+        </Grid>
+        <ListView x:Name="lvwEmployee"
+                  Grid.Row="2">
+            <ListView.View >
+                <GridView >
+                    <GridViewColumn Header="{x:Static p:Resources.IDS_DATE}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Date}"
+                                           Foreground="{Binding DateForeground}"
+                                           Background="{Binding DateBackground}"
+                                           HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="{x:Static p:Resources.IDS_CHECKIN}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding CheckinTime}"
+                                           Foreground="{Binding CheckinForeground}"
+                                           FontWeight="{Binding CheckinFontWeight}"
+                                           HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="{x:Static p:Resources.IDS_CHECKOUT}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding CheckoutTime}"
+                                           Foreground="{Binding CheckoutForeground}"
+                                           FontWeight="{Binding CheckoutFontWeight}"
+                                           HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="{x:Static p:Resources.IDS_WORK_TIME}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding WorkTime}"
+                                           Foreground="{Binding WorkTimeForeground}"
+                                           FontWeight="{Binding WorkTimeFontWeight}"
+                                           HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="{x:Static p:Resources.IDS_FREE_TIME}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FreeTime}"
+                                           Foreground="{Binding FreeTimeForeground}"
+                                           FontWeight="{Binding FreeTimeFontWeight}"
+                                           HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="{x:Static p:Resources.IDS_FLEXABLE}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding TotalFreeTimeText}"
+                                           Foreground="{Binding TotalFreeTimeForeground}"
+                                           FontWeight="{Binding TotalFreeTimeFontWeight}"
+                                           HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Rectangle x:Name="rtBackground"
+                   IsHitTestVisible="False"
+                   Grid.Row="2">
+            <Rectangle.Fill>
+                <ImageBrush x:Name="ibBackground"
+                            ImageSource="Assets/11313680_1607997646137881_225552885_n.jpg"
+                            Stretch="UniformToFill"
+                            Opacity="0.3"/>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Controls:ProgressRing x:Name="ring"
+                               Visibility="Hidden"
+                               Grid.Row="2"/>
+        <TextBlock x:Name="txtStandby"
+                   Text="{x:Static p:Resources.IDS_STANDBY}"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Visibility="Hidden"
+                   IsHitTestVisible="False"
+                   Grid.Row="2"/>
+    </Grid>
+</Controls:MetroWindow>
