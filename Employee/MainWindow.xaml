@@ -20,7 +20,6 @@
             <CheckBox x:Name="chkFWTran"
                       Content="{x:Static p:Resources.IDS_SDCC_FW_TRANSMISSION_MODE}"
                       Foreground="White"
-                      Visibility="Hidden"
                       Checked="chkFWTran_Checked"
                       Unchecked="chkFWTran_Unchecked"/>
         </Controls:WindowCommands>
@@ -62,15 +61,15 @@
         </Grid>
         <ListView x:Name="lvwEmployee"
                   Grid.Row="2">
-            <ListView.View >
-                <GridView >
+            <ListView.View>
+                <GridView>
                     <GridViewColumn Header="{x:Static p:Resources.IDS_DATE}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Date}"
                                            Foreground="{Binding DateForeground}"
-                                           Background="{Binding DateBackground}"
-                                           HorizontalAlignment="Right"/>
+                                           HorizontalAlignment="Right"
+                                           Loaded="TextBlock_Loaded"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -121,6 +120,7 @@
                                            Foreground="{Binding TotalFreeTimeForeground}"
                                            FontWeight="{Binding TotalFreeTimeFontWeight}"
                                            HorizontalAlignment="Right"/>
+
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

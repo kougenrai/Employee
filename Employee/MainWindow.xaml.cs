@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -33,6 +34,7 @@ namespace Employee
 
             if (Profile.GetBoolean(SDCC_FW_TRANSMISSION_MODE_KEY).GetValueOrDefault()) {
                 Downloader.SetProxy(PROXY_ADDRESS, PROXY_PORT);
+                chkFWTran.IsChecked = true;
             }
             txtName.Text = Profile.GetString(LAST_QUERY_NAME_KEY) ?? string.Empty;
             string version = FileVersionInfo.GetVersionInfo(System.Windows.Forms.Application.ExecutablePath).ProductVersion;
@@ -156,6 +158,9 @@ namespace Employee
                         hashtable.Remove(maxKey);
                         maxKey = null;
                     }
+                    if (inoutDesc.Count > 0) {
+                        inoutDesc[0].IsLastWorkDayOfMonth = true;
+                    }
 
                     ObservableCollection<Checkinout> inoutAsc = new ObservableCollection<Checkinout>();
                     for (int i = inoutDesc.Count - 1; i >= 0; i--) {
@@ -219,6 +224,22 @@ namespace Employee
         {
             Downloader.ClearPorxy();
             Profile.SetBoolean(SDCC_FW_TRANSMISSION_MODE_KEY, false);
+        }
+
+        private void TextBlock_Loaded(object sender, RoutedEventArgs e)
+        {
+            DependencyObject o = VisualTreeHelper.GetParent(sender as DependencyObject);
+            while (o != null) {
+                if (o is Border border) {
+                    if (border.DataContext is Checkinout checkinout) {
+                        if (checkinout.Background != Brushes.Transparent) {
+                            border.Background = checkinout.Background;
+                        }
+                    }
+                    break;
+                }
+                o = VisualTreeHelper.GetParent(o);
+            }
         }
     }
 }

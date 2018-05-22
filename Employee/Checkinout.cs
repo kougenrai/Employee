@@ -87,23 +87,20 @@ namespace Employee
         public bool LeaveEarly { get; private set; }
         public bool IsLastWorkDayOfMonth { get; set; }
 
-        public Brush DateBackground => IsToday || IsLastWorkDayOfMonth ? Brushes.Purple : Brushes.Transparent;
-        public Brush DateForeground => IsToday || IsLastWorkDayOfMonth ? Brushes.White : Brushes.Black;
-        public Brush CheckinForeground => Late ? Brushes.Red : Brushes.Black;
-        public Brush CheckoutForeground => LeaveEarly ? Brushes.Red : Brushes.Black;
-        public Brush WorkTimeForeground => WorkTime.TotalSeconds > FixedCoreWorkTimeSecond ? Brushes.Black : Brushes.Red;
-        public Brush FreeTimeForeground => FreeTime.TotalHours > 0 ? Brushes.Black : Brushes.Red;
-        public Brush TotalFreeTimeForeground => IsToday || IsLastWorkDayOfMonth ? 
-            (TotalFreeTime.TotalHours > 0 ? Brushes.Black : Brushes.Red) : Brushes.Black;
-
+        public Brush DateForeground => IsToday || IsLastWorkDayOfMonth ? Brushes.Black : Brushes.Black;
+        public Brush CheckinForeground => Late ? Brushes.Red : DateForeground;
+        public Brush CheckoutForeground => LeaveEarly ? Brushes.Red : DateForeground;
+        public Brush WorkTimeForeground => WorkTime.TotalSeconds > FixedCoreWorkTimeSecond ? DateForeground : Brushes.Red;
+        public Brush FreeTimeForeground => FreeTime.TotalHours > 0 ? DateForeground : Brushes.Red;
+        public Brush TotalFreeTimeForeground => TotalFreeTime.TotalHours > 0 ? DateForeground : Brushes.Red;
         public FontWeight CheckinFontWeight => Late ? FontWeights.Bold : FontWeights.Normal;
         public FontWeight CheckoutFontWeight => LeaveEarly ? FontWeights.Bold : FontWeights.Normal;
         public FontWeight WorkTimeFontWeight => WorkTime.TotalSeconds > FixedCoreWorkTimeSecond ? FontWeights.Normal : FontWeights.Bold;
         public FontWeight FreeTimeFontWeight => FreeTime.TotalHours > 0 ? FontWeights.Normal : FontWeights.Bold;
-        public FontWeight TotalFreeTimeFontWeight => IsToday || IsLastWorkDayOfMonth ?
-            (TotalFreeTime.TotalHours > 0 ? FontWeights.Normal : FontWeights.Bold) : FontWeights.Normal;
+        public FontWeight TotalFreeTimeFontWeight => TotalFreeTime.TotalHours > 0 ? FontWeights.Normal : FontWeights.Bold;
 
-        public bool IsToday => DateTime.Parse(Checkin).ToString("yyyyMMdd") == DateTime.Now.ToString("yyyyMMdd");
+        public bool IsToday => (DateTime.Parse(Checkin).ToString("yyyyMMdd") == DateTime.Now.ToString("yyyyMMdd"));
+        public Brush Background => IsToday || IsLastWorkDayOfMonth ? Brushes.LightGray : Brushes.Transparent;
 
         public override string ToString()
         {
