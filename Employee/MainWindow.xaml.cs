@@ -70,7 +70,7 @@ namespace Employee
                     StringBuilder stringBuilder = new StringBuilder();
                     stringBuilder.AppendLine(string.Format("TASKKILL /F /IM:employee.exe"));
                     stringBuilder.AppendLine(string.Format("PING 127.0.0.1"));
-                    stringBuilder.AppendLine(string.Format("COPY \"{0}\" \"{1}\"", tmpNew, System.Windows.Forms.Application.ExecutablePath));
+                    stringBuilder.AppendLine(string.Format("COPY \"{0}\" \"{1}\" /Y", tmpNew, System.Windows.Forms.Application.ExecutablePath));
                     stringBuilder.AppendLine(string.Format("DEL \"{0}\"", tmpNew));
                     stringBuilder.AppendLine(string.Format("DEL \"{0}\"", tmpBat));
                     File.WriteAllText(tmpBat, stringBuilder.ToString());
@@ -172,6 +172,11 @@ namespace Employee
                     double totalFreeTime = 0;
                     foreach (Checkinout checkinout in inoutAsc) {
                         string month = DateTime.Parse(checkinout.Checkin).ToString("yyyyMM");
+#if DEBUG
+                        if (DateTime.Parse(checkinout.Checkin).ToString("yyyyMMdd") == "20180601") {
+                            Debug.Assert(false);
+                        }
+#endif
                         if (!month.Equals(prevMonth)) {
                             totalFreeTime = 0;
                             prevMonth = month;
@@ -180,6 +185,9 @@ namespace Employee
                             }
                         }
                         totalFreeTime += checkinout.FreeTime.TotalSeconds;
+#if DEBUG
+                        string s = checkinout.TotalFreeTimeText;
+#endif
                         checkinout.TotalFreeTime = TimeSpan.FromSeconds(totalFreeTime);
                         prevCheckinout = checkinout;
                     }

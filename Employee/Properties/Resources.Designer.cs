@@ -214,7 +214,7 @@ namespace Employee.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 考勤查询 -- 码农不是万能的，但是没有码农是万万不能的.
+        ///   Looks up a localized string similar to 考勤查询 -- 梦想还是要有的，说不定哪天就实现了.
         /// </summary>
         public static string IDS_TITLE {
             get {

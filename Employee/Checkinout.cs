@@ -2,10 +2,8 @@
 using System.Windows;
 using System.Windows.Media;
 
-namespace Employee
-{
-    public class Checkinout
-    {
+namespace Employee {
+    public class Checkinout {
         private static string DateTimeFormat => "yyyy-MM-dd";
 
         // 一天固定工作时间，单位（秒）8小时
@@ -37,10 +35,12 @@ namespace Employee
         public string TotalFreeTimeText {
             get {
                 double totalSeconds = TotalFreeTime.TotalSeconds;
-                double hours = Math.Floor(totalSeconds / 3600);
-                double minutes = Math.Abs(Math.Floor((totalSeconds - hours * 3600) / 60));
-                double seconds = Math.Abs(totalSeconds % 60);
-                return string.Format("{0:D2}:{1:D2}:{2:D2}", (int)hours, (int)minutes, (int)seconds);
+                double hours = Math.Floor(Math.Abs(totalSeconds) / 3600);
+                double minutes = Math.Floor((Math.Abs(totalSeconds) - hours * 3600) / 60);
+                double seconds = Math.Abs(totalSeconds) % 60;
+                return string.Format("{0}{1:D2}:{2:D2}:{3:D2}",
+                    totalSeconds > 0 ? string.Empty : "-",
+                    (int)hours, (int)minutes, (int)seconds);
             }
         }
 
@@ -102,8 +102,7 @@ namespace Employee
         public bool IsToday => (DateTime.Parse(Checkin).ToString("yyyyMMdd") == DateTime.Now.ToString("yyyyMMdd"));
         public Brush Background => IsToday || IsLastWorkDayOfMonth ? Brushes.LightGray : Brushes.Transparent;
 
-        public override string ToString()
-        {
+        public override string ToString() {
             return string.Format("{0}, {1} - {2}, F:{3}， T:{4}",
                 new string[] {
                     DateTime.Parse(Checkin).ToString("yyyy-MM-dd"),
@@ -114,8 +113,7 @@ namespace Employee
                 });
         }
 
-        public void init()
-        {
+        public void init() {
             if (!string.IsNullOrEmpty(Checkin) && !string.IsNullOrEmpty(Checkout)) {
                 DateTime actualIn = DateTime.Parse(Checkin);
                 DateTime actualOut = DateTime.Parse(Checkout);
