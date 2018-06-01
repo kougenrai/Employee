@@ -106,7 +106,7 @@ namespace Employee.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 弹性时间.
+        ///   Looks up a localized string similar to 当天小计.
         /// </summary>
         public static string IDS_FREE_TIME {
             get {

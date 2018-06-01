@@ -96,7 +96,7 @@
                     <GridViewColumn Header="{x:Static p:Resources.IDS_WORK_TIME}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding WorkTime}"
+                                <TextBlock Text="{Binding WorkTimeText}"
                                            Foreground="{Binding WorkTimeForeground}"
                                            FontWeight="{Binding WorkTimeFontWeight}"
                                            HorizontalAlignment="Right"/>
@@ -106,7 +106,7 @@
                     <GridViewColumn Header="{x:Static p:Resources.IDS_FREE_TIME}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding FreeTime}"
+                                <TextBlock Text="{Binding FreeTimeText}"
                                            Foreground="{Binding FreeTimeForeground}"
                                            FontWeight="{Binding FreeTimeFontWeight}"
                                            HorizontalAlignment="Right"/>

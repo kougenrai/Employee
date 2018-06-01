@@ -34,13 +34,13 @@ namespace Employee {
         public TimeSpan TotalFreeTime { get; set; }
         public string TotalFreeTimeText {
             get {
-                double totalSeconds = TotalFreeTime.TotalSeconds;
-                double hours = Math.Floor(Math.Abs(totalSeconds) / 3600);
-                double minutes = Math.Floor((Math.Abs(totalSeconds) - hours * 3600) / 60);
-                double seconds = Math.Abs(totalSeconds) % 60;
-                return string.Format("{0}{1:D2}:{2:D2}:{3:D2}",
-                    totalSeconds > 0 ? string.Empty : "-",
-                    (int)hours, (int)minutes, (int)seconds);
+                string time = string.Empty;
+                if (string.IsNullOrEmpty(Checkout)) {
+                    time = "--:--:--";
+                } else {
+                    time = FormatTimeSpan(TotalFreeTime);
+                }
+                return time;
             }
         }
 
@@ -66,7 +66,9 @@ namespace Employee {
         public string CheckinTime {
             get {
                 string time = null;
-                if (!string.IsNullOrEmpty(Checkin)) {
+                if (string.IsNullOrEmpty(Checkin) || string.IsNullOrEmpty(Checkout)) {
+                    time = "--:--:--";
+                } else {
                     time = DateTime.Parse(Checkin).ToString("HH:mm:ss");
                 }
                 return time;
@@ -76,8 +78,34 @@ namespace Employee {
         public string CheckoutTime {
             get {
                 string time = null;
-                if (!string.IsNullOrEmpty(Checkout)) {
+                if (string.IsNullOrEmpty(Checkout)) {
+                    time = "--:--:--";
+                } else {
                     time = DateTime.Parse(Checkout).ToString("HH:mm:ss");
+                }
+                return time;
+            }
+        }
+
+        public string WorkTimeText {
+            get {
+                string time = null;
+                if (string.IsNullOrEmpty(Checkout)) {
+                    time = "--:--:--";
+                } else {
+                    time = FormatTimeSpan(WorkTime);
+                }
+                return time;
+            }
+        }
+
+        public string FreeTimeText {
+            get {
+                string time = null;
+                if (string.IsNullOrEmpty(Checkout)) {
+                    time = "--:--:--";
+                } else {
+                    time = FormatTimeSpan(FreeTime);
                 }
                 return time;
             }
@@ -90,16 +118,36 @@ namespace Employee {
         public Brush DateForeground => IsToday || IsLastWorkDayOfMonth ? Brushes.Black : Brushes.Black;
         public Brush CheckinForeground => Late ? Brushes.Red : DateForeground;
         public Brush CheckoutForeground => LeaveEarly ? Brushes.Red : DateForeground;
-        public Brush WorkTimeForeground => WorkTime.TotalSeconds > FixedCoreWorkTimeSecond ? DateForeground : Brushes.Red;
-        public Brush FreeTimeForeground => FreeTime.TotalHours > 0 ? DateForeground : Brushes.Red;
-        public Brush TotalFreeTimeForeground => TotalFreeTime.TotalHours > 0 ? DateForeground : Brushes.Red;
+        public Brush WorkTimeForeground {
+            get {
+                Brush brush = Brushes.Transparent;
+                if (string.IsNullOrEmpty(Checkout)) {
+                    brush = DateForeground;
+                } else {
+                    brush = WorkTime.TotalSeconds >= FixedCoreWorkTimeSecond ? DateForeground : Brushes.Red;
+                }
+                return brush;
+            }
+        }
+
+        public Brush FreeTimeForeground => FreeTime.TotalHours >= 0 ? DateForeground : Brushes.Red;
+        public Brush TotalFreeTimeForeground => TotalFreeTime.TotalHours >= 0 ? DateForeground : Brushes.Red;
         public FontWeight CheckinFontWeight => Late ? FontWeights.Bold : FontWeights.Normal;
         public FontWeight CheckoutFontWeight => LeaveEarly ? FontWeights.Bold : FontWeights.Normal;
-        public FontWeight WorkTimeFontWeight => WorkTime.TotalSeconds > FixedCoreWorkTimeSecond ? FontWeights.Normal : FontWeights.Bold;
-        public FontWeight FreeTimeFontWeight => FreeTime.TotalHours > 0 ? FontWeights.Normal : FontWeights.Bold;
-        public FontWeight TotalFreeTimeFontWeight => TotalFreeTime.TotalHours > 0 ? FontWeights.Normal : FontWeights.Bold;
+        public FontWeight WorkTimeFontWeight => WorkTime.TotalSeconds >= FixedCoreWorkTimeSecond ? FontWeights.Normal : FontWeights.Bold;
+        public FontWeight FreeTimeFontWeight => FreeTime.TotalHours >= 0 ? FontWeights.Normal : FontWeights.Bold;
+        public FontWeight TotalFreeTimeFontWeight => TotalFreeTime.TotalHours >= 0 ? FontWeights.Normal : FontWeights.Bold;
 
-        public bool IsToday => (DateTime.Parse(Checkin).ToString("yyyyMMdd") == DateTime.Now.ToString("yyyyMMdd"));
+        public bool IsToday {
+            get {
+                bool b = false;
+                if (!string.IsNullOrEmpty(Checkin) && !string.IsNullOrEmpty(Checkout)) {
+                    b = (DateTime.Parse(Checkin).ToString("yyyyMMdd") == DateTime.Now.ToString("yyyyMMdd"));
+                }
+                return b;
+            }
+        }
+
         public Brush Background => IsToday || IsLastWorkDayOfMonth ? Brushes.LightGray : Brushes.Transparent;
 
         public override string ToString() {
@@ -111,6 +159,16 @@ namespace Employee {
                     FreeTime.ToString(),
                     TotalFreeTimeText,
                 });
+        }
+
+        private string FormatTimeSpan(TimeSpan time) {
+            double totalSeconds = time.TotalSeconds;
+            double hours = Math.Floor(Math.Abs(totalSeconds) / 3600);
+            double minutes = Math.Floor((Math.Abs(totalSeconds) - hours * 3600) / 60);
+            double seconds = Math.Abs(totalSeconds) % 60;
+            return string.Format("{0}{1:D2}:{2:D2}:{3:D2}",
+                totalSeconds > 0 ? string.Empty : "-",
+                (int)hours, (int)minutes, (int)seconds);
         }
 
         public void init() {

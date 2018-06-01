@@ -133,7 +133,7 @@
     <value>Simsun</value>
   </data>
   <data name="IDS_FREE_TIME" xml:space="preserve">
-    <value>弹性时间</value>
+    <value>当天小计</value>
   </data>
   <data name="IDS_FRIDAY" xml:space="preserve">
     <value>五</value>

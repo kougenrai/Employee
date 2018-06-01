@@ -2,8 +2,10 @@
 using MahApps.Metro.Controls;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -14,13 +16,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace Employee
-{
+namespace Employee {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : MetroWindow
-    {
+    public partial class MainWindow : MetroWindow {
         private Cursor m_normal = null;
         private Cursor m_leftDown = null;
         private static string SDCC_FW_TRANSMISSION_MODE_KEY => "SDCCFwTransmissionMode";
@@ -28,8 +28,7 @@ namespace Employee
         private static string PROXY_ADDRESS = "13.187.0.55";
         private static int PROXY_PORT = 8000;
 
-        public MainWindow()
-        {
+        public MainWindow() {
             InitializeComponent();
 
             if (Profile.GetBoolean(SDCC_FW_TRANSMISSION_MODE_KEY).GetValueOrDefault()) {
@@ -55,8 +54,7 @@ namespace Employee
             PreviewMouseLeftButtonUp += UserControl_PreviewMouseLeftButtonUp;
         }
 
-        private void Update()
-        {
+        private void Update() {
             string tmpNew = Path.GetTempFileName();
             string tmpBat = Path.GetTempFileName();
             File.Delete(tmpNew);
@@ -79,8 +77,7 @@ namespace Employee
             }
         }
 
-        private void UserControl_MouseMove(object sender, MouseEventArgs e)
-        {
+        private void UserControl_MouseMove(object sender, MouseEventArgs e) {
             if (e.LeftButton == MouseButtonState.Pressed) {
                 if (!ReferenceEquals(Cursor, m_leftDown)) {
                     Cursor = m_leftDown;
@@ -94,25 +91,21 @@ namespace Employee
             e.Handled = true;
         }
 
-        private void UserControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
+        private void UserControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
             Cursor = m_leftDown;
         }
 
-        private void UserControl_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
+        private void UserControl_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
             if (!ReferenceEquals(Cursor, m_normal)) {
                 Cursor = m_normal;
             }
         }
 
-        private void btnQuery_Click(object sender, RoutedEventArgs e)
-        {
+        private void btnQuery_Click(object sender, RoutedEventArgs e) {
             ExecuteQuery();
         }
 
-        private void ExecuteQuery()
-        {
+        private void ExecuteQuery() {
             string name = txtName.Text;
             if (!string.IsNullOrEmpty(name)) {
                 btnQuery.IsEnabled = false;
@@ -141,22 +134,22 @@ namespace Employee
                     }
 
                     ObservableCollection<Checkinout> inoutDesc = new ObservableCollection<Checkinout>();
-                    string maxKey = null;
+                    string maxDateKey = null;
                     while (hashtable.Count > 0) {
                         foreach (DictionaryEntry entry in hashtable) {
-                            if (maxKey == null) {
-                                maxKey = entry.Key as string;
+                            if (maxDateKey == null) {
+                                maxDateKey = entry.Key as string;
                             } else {
                                 if (entry.Key is string key) {
-                                    if (maxKey.CompareTo(key) < 0) {
-                                        maxKey = key;
+                                    if (maxDateKey.CompareTo(key) < 0) {
+                                        maxDateKey = key;
                                     }
                                 }
                             }
                         }
-                        inoutDesc.Add(hashtable[maxKey] as Checkinout);
-                        hashtable.Remove(maxKey);
-                        maxKey = null;
+                        inoutDesc.Add(hashtable[maxDateKey] as Checkinout);
+                        hashtable.Remove(maxDateKey);
+                        maxDateKey = null;
                     }
                     if (inoutDesc.Count > 0) {
                         inoutDesc[0].IsLastWorkDayOfMonth = true;
@@ -170,24 +163,18 @@ namespace Employee
                     string prevMonth = null;
                     Checkinout prevCheckinout = null;
                     double totalFreeTime = 0;
+                    Stack<string> monthes = new Stack<string>();
                     foreach (Checkinout checkinout in inoutAsc) {
                         string month = DateTime.Parse(checkinout.Checkin).ToString("yyyyMM");
-#if DEBUG
-                        if (DateTime.Parse(checkinout.Checkin).ToString("yyyyMMdd") == "20180601") {
-                            Debug.Assert(false);
-                        }
-#endif
                         if (!month.Equals(prevMonth)) {
                             totalFreeTime = 0;
                             prevMonth = month;
                             if (prevCheckinout != null) {
                                 prevCheckinout.IsLastWorkDayOfMonth = true;
                             }
+                            monthes.Push(month);
                         }
                         totalFreeTime += checkinout.FreeTime.TotalSeconds;
-#if DEBUG
-                        string s = checkinout.TotalFreeTimeText;
-#endif
                         checkinout.TotalFreeTime = TimeSpan.FromSeconds(totalFreeTime);
                         prevCheckinout = checkinout;
                     }
@@ -198,9 +185,45 @@ namespace Employee
                             txtStandby.Visibility = Visibility.Visible;
                         });
                     }
-                    Thread.Sleep(500);
+                    ObservableCollection<Checkinout> inoutDescAllDays = new ObservableCollection<Checkinout>();
+                    while (monthes.Count > 0) {
+                        string m = monthes.Pop();
+                        int year = int.Parse(m.Substring(0, 4));
+                        int month = int.Parse(m.Substring(4, 2));
+                        int days = DateTime.DaysInMonth(year, month);
+                        string now = DateTime.Now.ToString("yyyyMMdd");
+                        for (int i = days; i >= 1; i--) {
+                            string day = string.Format("{0}{1:D2}{2:D2}", year, month, i);
+                            if (now.CompareTo(day) >= 0) {
+                                Checkinout thisCheckinout = null;
+                                foreach (Checkinout checkinout in inoutDesc) {
+                                    if (DateTime.Parse(checkinout.Checkin).ToString("yyyyMMdd").Equals(day)) {
+                                        thisCheckinout = checkinout;
+                                        inoutDesc.Remove(checkinout);
+                                        break;
+                                    }
+                                }
+                                if (thisCheckinout == null && inoutDescAllDays.Count > 0) {
+                                    DateTime dt = new DateTime(year, month, i);
+                                    switch (dt.DayOfWeek) {
+                                        case DayOfWeek.Saturday:
+                                        case DayOfWeek.Sunday:
+                                            break;
+                                        default:
+                                            thisCheckinout = new Checkinout {
+                                                Checkin = dt.ToString("yyyy/MM/dd HH:mm:ss")
+                                            };
+                                            break;
+                                    }
+                                }
+                                if (thisCheckinout != null) {
+                                    inoutDescAllDays.Add(thisCheckinout);
+                                }
+                            }
+                        }
+                    }
                     lvwEmployee.Dispatcher.Invoke(() => {
-                        lvwEmployee.ItemsSource = inoutDesc;
+                        lvwEmployee.ItemsSource = inoutDescAllDays;
                         btnQuery.IsEnabled = true;
                         ring.Visibility = Visibility.Hidden;
                         txtStandby.Visibility = Visibility.Hidden;
@@ -210,32 +233,27 @@ namespace Employee
             }
         }
 
-        private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
-        {
+        private void MetroWindow_Loaded(object sender, RoutedEventArgs e) {
             txtName.Focus();
         }
 
-        private void txtName_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
+        private void txtName_PreviewKeyDown(object sender, KeyEventArgs e) {
             switch (e.Key) {
                 case Key.Enter: { ExecuteQuery(); } break;
             }
         }
 
-        private void chkFWTran_Checked(object sender, RoutedEventArgs e)
-        {
+        private void chkFWTran_Checked(object sender, RoutedEventArgs e) {
             Downloader.SetProxy(PROXY_ADDRESS, PROXY_PORT);
             Profile.SetBoolean(SDCC_FW_TRANSMISSION_MODE_KEY, true);
         }
 
-        private void chkFWTran_Unchecked(object sender, RoutedEventArgs e)
-        {
+        private void chkFWTran_Unchecked(object sender, RoutedEventArgs e) {
             Downloader.ClearPorxy();
             Profile.SetBoolean(SDCC_FW_TRANSMISSION_MODE_KEY, false);
         }
 
-        private void TextBlock_Loaded(object sender, RoutedEventArgs e)
-        {
+        private void TextBlock_Loaded(object sender, RoutedEventArgs e) {
             DependencyObject o = VisualTreeHelper.GetParent(sender as DependencyObject);
             while (o != null) {
                 if (o is Border border) {
